@@ -1,0 +1,22 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+env/
+.myenv/
+*.env
+
+# SQLite database
+*.sqlite3
+*.db
+
+# OS files
+.DS_Store
+
+# VS Code settings
+.vscode/
+
+# Logs
+*.log
