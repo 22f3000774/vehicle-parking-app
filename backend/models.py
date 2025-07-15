@@ -1,8 +1,9 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Boolean
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
 
 # User model
 class User(Base):
@@ -10,7 +11,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    is_admin = Column(Boolean, default=False)  # For predefined admin
+    full_name = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False) # For predefined admin
 
     reservations = relationship('Reservation', back_populates='user')
 

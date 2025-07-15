@@ -1,0 +1,13 @@
+<!-- templates/user_dashboard.html -->
+<!DOCTYPE html>
+<html>
+<head><title>User Dashboard</title></head>
+<body>
+  <h1>Welcome, {{ full_name }}!</h1>
+  <ul>
+    <li>View and reserve parking spots</li>
+    <li>Manage your reservations</li>
+  </ul>
+  <a href="{{ url_for('auth.logout') }}">Logout</a>
+</body>
+</html>
