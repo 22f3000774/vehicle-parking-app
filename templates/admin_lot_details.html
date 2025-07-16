@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lot Details</title>
+</head>
+<body>
+  <h2>{{ lot.name }} ({{ lot.location }})</h2>
+  <p><strong>Capacity:</strong> {{ lot.capacity }}</p>
+  <p><strong>Amenities:</strong> {{ lot.amenities }}</p>
+  <p><strong>Pricing:</strong> {{ lot.pricing }}</p>
+  
+  <h3>Parking Spots</h3>
+  <ul>
+    {% for spot in spots %}
+      <li>Spot {{ spot.spot_number }} - {{ spot.status }}</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{{ url_for('auth.admin_lots') }}">⬅ Back to Lots</a>
+</body>
+</html>

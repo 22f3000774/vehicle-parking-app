@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Users</title>
+</head>
+<body>
+  <h2>Registered Users</h2>
+  <ul>
+    {% for user in users %}
+      <li>{{ user.full_name }} — {{ user.username }}</li>
+    {% endfor %}
+  </ul>
+  <a href="{{ url_for('auth.admin_dashboard') }}">⬅ Back to Dashboard</a>
+</body>
+</html>

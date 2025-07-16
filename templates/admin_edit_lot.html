@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Parking Lot</title>
+</head>
+<body>
+  <h2>Edit Parking Lot</h2>
+  <form method="post">
+    <input type="text" name="name" value="{{ lot.name }}" required><br><br>
+    <input type="text" name="location" value="{{ lot.location }}" required><br><br>
+    <input type="number" name="capacity" value="{{ lot.capacity }}" required><br><br>
+    <input type="text" name="amenities" value="{{ lot.amenities }}"><br><br>
+    <input type="text" name="pricing" value="{{ lot.pricing }}"><br><br>
+    <button type="submit">Save Changes</button>
+  </form>
+  <a href="{{ url_for('auth.admin_lots') }}">⬅ Back to Lots</a>
+</body>
+</html>

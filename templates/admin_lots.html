@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Parking Lots</title>
+</head>
+<body>
+  <h2>All Parking Lots</h2>
+  <a href="{{ url_for('auth.admin_create_lot') }}">➕ Create New Lot</a>
+  <ul>
+    {% for lot in lots %}
+      <li>
+        <strong>{{ lot.name }}</strong> ({{ lot.location }}) 
+        | <a href="{{ url_for('auth.admin_lot_details', lot_id=lot.id) }}">Details</a>
+        | <a href="{{ url_for('auth.admin_edit_lot', lot_id=lot.id) }}">Edit</a>
+        | <form action="{{ url_for('auth.admin_delete_lot', lot_id=lot.id) }}" method="post" style="display:inline;">
+            <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+          </form>
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="{{ url_for('auth.admin_dashboard') }}">⬅ Back to Dashboard</a>
+</body>
+</html>
