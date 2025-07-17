@@ -13,6 +13,7 @@
       <th>Start Time</th>
       <th>End Time</th>
       <th>Duration</th>
+      <th>Cost (₹)</th>      
       <th>Status</th>
     </tr>
     {% for r in reservations %}
@@ -29,6 +30,7 @@
           -
         {% endif %}
       </td>
+       <td>{{ r.cost if r.cost else '-' }}</td> 
       <td>{{ r.status }}</td>
     </tr>
     {% endfor %}

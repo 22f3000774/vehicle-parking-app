@@ -24,9 +24,9 @@ class ParkingLot(Base):
     location = Column(String, nullable=False)
     capacity = Column(Integer, nullable=False)
     amenities = Column(String)
-    pricing = Column(String)
-
+    pricing = Column(Integer, default=10)  # e.g., per hour
     spots = relationship('ParkingSpot', back_populates='lot')
+
 
 # Parking Spot model
 class ParkingSpot(Base):
@@ -49,9 +49,11 @@ class Reservation(Base):
     start_time = Column(DateTime)
     end_time = Column(DateTime)
     status = Column(String, default='active')  # active, cancelled, completed
+    cost = Column(Integer)  # Add this line to store parking cost
 
     user = relationship('User', back_populates='reservations')
     spot = relationship('ParkingSpot', back_populates='reservations')
+
 
 __all__ = [
     'Base',

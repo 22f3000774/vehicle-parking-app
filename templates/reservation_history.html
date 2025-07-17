@@ -31,6 +31,19 @@
     </tr>
     {% endfor %}
   </table>
+
+  <tr>
+  <td>{{ r.spot.lot.name }}</td>
+  <td>{{ r.spot.spot_number }}</td>
+  <td>{{ r.start_time }}</td>
+  <td>{{ r.end_time or '-' }}</td>
+  <td>
+    {% if r.end_time %}{{ (r.end_time - r.start_time) }}{% else %}-{% endif %}
+  </td>
+  <td>{{ r.cost if r.cost else '-' }}</td> <!-- Display cost -->
+  <td>{{ r.status }}</td>
+</tr>
+
   <a href="{{ url_for('auth.user_dashboard') }}">Back to Dashboard</a>
 </body>
 </html>

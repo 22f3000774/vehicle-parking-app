@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+
 
 engine = create_engine('sqlite:///parking_lot_app.db')
 Session = sessionmaker(bind=engine)
@@ -186,3 +188,24 @@ def admin_parking_records():
     reservations = session_db.query(Reservation).order_by(Reservation.start_time.desc()).all()
     session_db.close()
     return render_template('admin_parking_records.html', reservations=reservations)
+
+@auth_bp.route('/release/<int:reservation_id>', methods=['POST'])
+def release_spot(reservation_id):
+    if not session.get('user_id') or session.get('is_admin'):
+        flash('Unauthorized access.')
+        return redirect(url_for('auth.login'))
+    session_db = Session()
+    reservation = session_db.query(Reservation).get(reservation_id)
+    if reservation and reservation.status in ('active', 'occupied'):
+        reservation.spot.status = 'available'
+        reservation.status = 'completed'
+        reservation.end_time = datetime.now()
+        # Calculate cost
+        lot = reservation.spot.lot
+        duration = (reservation.end_time - reservation.start_time).total_seconds() / 3600  # hours
+        price_per_hour = lot.pricing if lot.pricing else 10  # default to 10 if missing
+        reservation.cost = int(duration * price_per_hour)
+        session_db.commit()
+        flash(f'Spot released. Total cost: ₹{reservation.cost}')
+    session_db.close()
+    return redirect(url_for('auth.user_reservations'))
