@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Parking Records</title>
+</head>
+<body>
+  <h2>All Parking/Reservation Records</h2>
+  <table border="1">
+    <tr>
+      <th>User</th>
+      <th>Lot</th>
+      <th>Spot</th>
+      <th>Start Time</th>
+      <th>End Time</th>
+      <th>Duration</th>
+      <th>Status</th>
+    </tr>
+    {% for r in reservations %}
+    <tr>
+      <td>{{ r.user.full_name }} ({{ r.user.username }})</td>
+      <td>{{ r.spot.lot.name }}</td>
+      <td>{{ r.spot.spot_number }}</td>
+      <td>{{ r.start_time }}</td>
+      <td>{{ r.end_time or '-' }}</td>
+      <td>
+        {% if r.end_time %}
+          {{ (r.end_time - r.start_time) }}
+        {% else %}
+          -
+        {% endif %}
+      </td>
+      <td>{{ r.status }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <a href="{{ url_for('auth.admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

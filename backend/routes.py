@@ -164,3 +164,25 @@ def admin_users():
     users = session_db.query(User).filter(User.is_admin == False).all()
     session_db.close()
     return render_template('admin_users.html', users=users)
+
+# Show all reservations for the current user
+@auth_bp.route('/reservations/history')
+def reservation_history():
+    if 'user_id' not in session or session.get('is_admin'):
+        flash('Unauthorized access.')
+        return redirect(url_for('auth.login'))
+    session_db = Session()
+    reservations = session_db.query(Reservation).filter_by(user_id=session['user_id']).order_by(Reservation.start_time.desc()).all()
+    session_db.close()
+    return render_template('reservation_history.html', reservations=reservations)
+
+# Admin view: All parking/reservation records
+@auth_bp.route('/admin/parking_records')
+def admin_parking_records():
+    if 'user_id' not in session or not session.get('is_admin'):
+        flash('Unauthorized access.')
+        return redirect(url_for('auth.login'))
+    session_db = Session()
+    reservations = session_db.query(Reservation).order_by(Reservation.start_time.desc()).all()
+    session_db.close()
+    return render_template('admin_parking_records.html', reservations=reservations)
