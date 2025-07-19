@@ -1,20 +1,20 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-
+from flask_login import UserMixin  # ✅ Add this
 Base = declarative_base()
 
-
-# User model
-class User(Base):
+# ✅ User model with UserMixin
+class User(Base, UserMixin):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
-    is_admin = Column(Boolean, default=False) # For predefined admin
+    is_admin = Column(Boolean, default=False)  # For predefined admin
 
     reservations = relationship('Reservation', back_populates='user')
+
 
 # Parking Lot model
 class ParkingLot(Base):
@@ -40,6 +40,7 @@ class ParkingSpot(Base):
     lot = relationship('ParkingLot', back_populates='spots')
     reservations = relationship('Reservation', back_populates='spot')
 
+
 # Reservation model
 class Reservation(Base):
     __tablename__ = 'reservations'
@@ -49,7 +50,7 @@ class Reservation(Base):
     start_time = Column(DateTime)
     end_time = Column(DateTime)
     status = Column(String, default='active')  # active, cancelled, completed
-    cost = Column(Integer)  # Add this line to store parking cost
+    cost = Column(Integer)
 
     user = relationship('User', back_populates='reservations')
     spot = relationship('ParkingSpot', back_populates='reservations')
