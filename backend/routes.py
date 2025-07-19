@@ -7,6 +7,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from sqlalchemy.orm import joinedload
 from flask import jsonify
+from sqlalchemy import func
+
 
 
 
@@ -19,28 +21,6 @@ auth_bp = Blueprint('auth', __name__)
 def home():
     return redirect(url_for('auth.login'))
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        session_db = Session()
-        username = request.form['username']
-        full_name = request.form['full_name']
-        password = generate_password_hash(request.form['password'])
-
-        if session_db.query(User).filter_by(username=username).first():
-            flash('Username already exists.')
-            session_db.close()
-            return redirect(url_for('auth.register'))
-
-        new_user = User(username=username, full_name=full_name, password=password, is_admin=False)
-        session_db.add(new_user)
-        session_db.commit()
-        session_db.close()
-        flash('Registration successful.')
-        return redirect(url_for('auth.login'))
-    return render_template('register.html')
-
-# In backend/routes.py
 @auth_bp.route('/admin/dashboard')
 def admin_dashboard():
     if not session.get('user_id') or not session.get('is_admin'):
@@ -380,3 +360,66 @@ def api_reservations():
         'cost': r.cost,
         'status': r.status
     } for r in reservations])
+
+@auth_bp.route('/admin/parking_stats')
+def admin_parking_stats():
+    if not session.get('user_id') or not session.get('is_admin'):
+        flash('Unauthorized access.')
+        return redirect(url_for('auth.login'))
+    session_db = Session()
+    # Example: Count reservations per user
+    data = (
+        session_db.query(User.full_name, func.count(Reservation.id))
+        .join(Reservation, Reservation.user_id == User.id)
+        .group_by(User.full_name)
+        .all()
+    )
+    session_db.close()
+    labels = [d[0] for d in data]
+    counts = [d[1] for d in data]
+    return render_template('admin_parking_stats.html', labels=labels, counts=counts)
+
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        full_name = request.form['full_name'].strip()
+        password = request.form['password'].strip()
+        
+        if not username or not full_name or not password:
+            flash('All fields are required.')
+            return redirect(url_for('auth.register'))
+        
+        if not re.match(r'^[a-zA-Z0-9_]{3,}$', username):
+            flash('Username should be at least 3 characters and contain only letters, numbers, or underscores.')
+            return redirect(url_for('auth.register'))
+
+        if len(password) < 6:
+            flash('Password must be at least 6 characters long.')
+            return redirect(url_for('auth.register'))
+
+        session_db = Session()
+        existing_user = session_db.query(User).filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists. Please choose a different one.')
+            session_db.close()
+            return redirect(url_for('auth.register'))
+
+        hashed_password = generate_password_hash(password)
+        new_user = User(
+            username=username,
+            full_name=full_name,
+            password=hashed_password,
+            is_admin=False  
+        )
+
+        session_db.add(new_user)
+        session_db.commit()
+        session_db.close()
+
+        flash('Registration successful! You can now log in.')
+        return redirect(url_for('auth.login'))
+
+    return render_template('register.html')
+
