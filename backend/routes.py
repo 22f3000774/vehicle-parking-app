@@ -310,3 +310,27 @@ def release_spot(reservation_id):
 
     session_db.close()
     return redirect(url_for('auth.reservation_history'))
+
+@auth_bp.route('/admin/search', methods=['GET', 'POST'])
+def admin_search():
+    if 'user_id' not in session or not session.get('is_admin'):
+        flash('Unauthorized access.')
+        return redirect(url_for('auth.login'))
+
+    results = []
+    query = ''
+    search_type = ''
+
+    if request.method == 'POST':
+        query = request.form['query'].strip()
+        search_type = request.form['search_type']
+        session_db = Session()
+        if search_type == 'user':
+            results = session_db.query(User).filter(User.username.ilike(f'%{query}%')).all()
+        elif search_type == 'spot':
+            results = session_db.query(ParkingSpot).filter(ParkingSpot.spot_number.ilike(f'%{query}%')).all()
+        elif search_type == 'vacancy':
+            results = session_db.query(ParkingSpot).filter(ParkingSpot.status == query).all() # e.g. 'available' or 'occupied'
+        session_db.close()
+
+    return render_template('admin_search.html', results=results, query=query, search_type=search_type)
