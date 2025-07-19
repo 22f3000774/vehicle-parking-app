@@ -6,6 +6,8 @@ from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from sqlalchemy.orm import joinedload
+from flask import jsonify
+
 
 
 engine = create_engine('sqlite:///parking_lot_app.db')
@@ -334,3 +336,47 @@ def admin_search():
         session_db.close()
 
     return render_template('admin_search.html', results=results, query=query, search_type=search_type)
+
+
+# Get all lots
+@auth_bp.route('/api/lots', methods=['GET'])
+def api_lots():
+    session_db = Session()
+    lots = session_db.query(ParkingLot).all()
+    session_db.close()
+    return jsonify([{
+        'id': lot.id,
+        'name': lot.name,
+        'location': lot.location,
+        'capacity': lot.capacity,
+        'pricing': lot.pricing
+    } for lot in lots])
+
+# Get all spots
+@auth_bp.route('/api/spots', methods=['GET'])
+def api_spots():
+    session_db = Session()
+    spots = session_db.query(ParkingSpot).all()
+    session_db.close()
+    return jsonify([{
+        'id': spot.id,
+        'lot_id': spot.lot_id,
+        'spot_number': spot.spot_number,
+        'status': spot.status
+    } for spot in spots])
+
+# Get all reservations
+@auth_bp.route('/api/reservations', methods=['GET'])
+def api_reservations():
+    session_db = Session()
+    reservations = session_db.query(Reservation).all()
+    session_db.close()
+    return jsonify([{
+        'id': r.id,
+        'user_id': r.user_id,
+        'spot_id': r.spot_id,
+        'start_time': r.start_time.isoformat() if r.start_time else None,
+        'end_time': r.end_time.isoformat() if r.end_time else None,
+        'cost': r.cost,
+        'status': r.status
+    } for r in reservations])
