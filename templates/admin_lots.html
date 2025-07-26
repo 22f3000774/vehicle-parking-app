@@ -2,22 +2,63 @@
 <html>
 <head>
   <title>Manage Parking Lots</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-  <h2>All Parking Lots</h2>
-  <a href="{{ url_for('auth.admin_create_lot') }}">➕ Create New Lot</a>
-  <ul>
-    {% for lot in lots %}
-      <li>
-        <strong>{{ lot.name }}</strong> ({{ lot.location }}) 
-        | <a href="{{ url_for('auth.admin_lot_details', lot_id=lot.id) }}">Details</a>
-        | <a href="{{ url_for('auth.admin_edit_lot', lot_id=lot.id) }}">Edit</a>
-        | <form action="{{ url_for('auth.admin_delete_lot', lot_id=lot.id) }}" method="post" style="display:inline;">
-            <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+  <!-- BOOTSTRAP NAVBAR START -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="{{ url_for('auth.admin_dashboard') }}">Sahu Parking Admin</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="adminNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link{% if request.endpoint == 'auth.admin_dashboard' %} active{% endif %}" href="{{ url_for('auth.admin_dashboard') }}">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if request.endpoint in ['auth.admin_lots', 'auth.admin_lot_details', 'auth.admin_edit_lot'] %} active{% endif %}" href="{{ url_for('auth.admin_lots') }}">Parking Lots</a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link{% if request.endpoint == 'auth.admin_parking_records' %} active{% endif %}" href="{{ url_for('auth.admin_parking_records') }}">Parking Records</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if request.endpoint == 'auth.admin_parking_stats' %} active{% endif %}" href="{{ url_for('auth.admin_parking_stats') }}">Parking Charts</a>
+          </li>
+        </ul>
+        <span class="navbar-text me-3">
+          Admin
+        </span>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <!-- BOOTSTRAP NAVBAR END -->
+
+  <div class="container">
+    <h2>All Parking Lots</h2>
+    <a href="{{ url_for('auth.admin_create_lot') }}" class="btn btn-primary mb-3">➕ Create New Lot</a>
+    <ul class="list-group mb-3">
+      {% for lot in lots %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ lot.name }}</strong> ({{ lot.location }})
+            | <a href="{{ url_for('auth.admin_lot_details', lot_id=lot.id) }}">Details</a>
+            | <a href="{{ url_for('auth.admin_edit_lot', lot_id=lot.id) }}">Edit</a>
+          </div>
+          <form action="{{ url_for('auth.admin_delete_lot', lot_id=lot.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
           </form>
-      </li>
-    {% endfor %}
-  </ul>
-  <a href="{{ url_for('auth.admin_dashboard') }}">⬅ Back to Dashboard</a>
+        </li>
+      {% endfor %}
+    </ul>
+    <a href="{{ url_for('auth.admin_dashboard') }}" class="btn btn-secondary">⬅ Back to Dashboard</a>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
