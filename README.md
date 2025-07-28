@@ -35,12 +35,6 @@ venv\Scripts\activate # Windows
 3. **Install Python dependencies:**
 pip install -r requirements.txt
 
-> **Note:** If `requirements.txt` is not provided, install manually:
->
-> ```
-> pip install flask flask-login sqlalchemy werkzeug
-> ```
-
 4. **Initialize the database:**
 
 Run the database creation script to create database tables and an initial admin user:
@@ -78,7 +72,6 @@ By default, the app runs on [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ## Additional Notes
 
-- Passwords are securely hashed using Werkzeug’s security methods.
 - Database used is SQLite for easy local development; can be extended to other DBs.
 - The API endpoint `/api/lots` is available (admin only) for fetching parking lot data in JSON format.
 - For charts, Chart.js with plugins is used to provide interactive visualizations.
