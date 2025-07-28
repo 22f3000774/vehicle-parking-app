@@ -8,34 +8,37 @@
 <body>
   <!-- BOOTSTRAP NAVBAR START -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="{{ url_for('auth.admin_dashboard') }}">Sahu Parking Admin</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="adminNav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link{% if request.endpoint == 'auth.admin_dashboard' %} active{% endif %}" href="{{ url_for('auth.admin_dashboard') }}">Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link{% if request.endpoint in ['auth.admin_lots', 'auth.admin_lot_details', 'auth.admin_edit_lot'] %} active{% endif %}" href="{{ url_for('auth.admin_lots') }}">Parking Lots</a>
-          </li>
-          
-          <li class="nav-item">
-            <a class="nav-link{% if request.endpoint == 'auth.admin_parking_records' %} active{% endif %}" href="{{ url_for('auth.admin_parking_records') }}">Parking Records</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link{% if request.endpoint == 'auth.admin_parking_stats' %} active{% endif %}" href="{{ url_for('auth.admin_parking_stats') }}">Parking Charts</a>
-          </li>
-        </ul>
-        <span class="navbar-text me-3">
-          Admin
-        </span>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
-      </div>
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{{ url_for('auth.admin_dashboard') }}">Sahu Parking Admin</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="adminNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link{% if request.endpoint == 'auth.admin_dashboard' %} active{% endif %}" href="{{ url_for('auth.admin_dashboard') }}">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link{% if request.endpoint in ['auth.admin_lots', 'auth.admin_lot_details', 'auth.admin_edit_lot'] %} active{% endif %}" href="{{ url_for('auth.admin_lots') }}">Parking Lots</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link{% if request.endpoint == 'auth.admin_users' %} active{% endif %}" href="{{ url_for('auth.admin_users') }}">All Users</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link{% if request.endpoint == 'auth.admin_parking_records' %} active{% endif %}" href="{{ url_for('auth.admin_parking_records') }}">Parking Records</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link{% if request.endpoint == 'auth.admin_parking_stats' %} active{% endif %}" href="{{ url_for('auth.admin_parking_stats') }}">Parking Charts</a>
+        </li>
+      </ul>
+      <span class="navbar-text me-3">
+        Admin
+      </span>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
     </div>
-  </nav>
+  </div>
+</nav>
+
   <!-- BOOTSTRAP NAVBAR END -->
 
   <div class="container">

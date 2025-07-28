@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" href="{{ url_for('auth.admin_dashboard') }}">Sahu Parking Admin</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,9 +29,11 @@
           <a class="nav-link{% if request.endpoint == 'auth.admin_dashboard' %} active{% endif %}" href="{{ url_for('auth.admin_dashboard') }}">Dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link{% if request.endpoint == 'auth.admin_lots' %} active{% endif %}" href="{{ url_for('auth.admin_lots') }}">Parking Lots</a>
+          <a class="nav-link{% if request.endpoint in ['auth.admin_lots', 'auth.admin_lot_details', 'auth.admin_edit_lot'] %} active{% endif %}" href="{{ url_for('auth.admin_lots') }}">Parking Lots</a>
         </li>
-        
+        <li class="nav-item">
+          <a class="nav-link{% if request.endpoint == 'auth.admin_users' %} active{% endif %}" href="{{ url_for('auth.admin_users') }}">All Users</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link{% if request.endpoint == 'auth.admin_parking_records' %} active{% endif %}" href="{{ url_for('auth.admin_parking_records') }}">Parking Records</a>
         </li>
@@ -46,8 +48,9 @@
     </div>
   </div>
 </nav>
+
   <div class="dashboard-container mt-5 p-4 border bg-white rounded shadow">
-    <h2 class="text-primary mb-4">👩‍💼 Admin Dashboard</h2>
+    <h2 class="text-primary mb-4"> Admin Dashboard</h2>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}

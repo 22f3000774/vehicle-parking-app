@@ -7,6 +7,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js Data Labels Plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body class="bg-light">
   <!-- BOOTSTRAP NAVBAR START -->
@@ -24,7 +26,9 @@
           <li class="nav-item">
             <a class="nav-link{% if request.endpoint in ['auth.admin_lots', 'auth.admin_lot_details', 'auth.admin_edit_lot'] %} active{% endif %}" href="{{ url_for('auth.admin_lots') }}">Parking Lots</a>
           </li>
-         
+          <li class="nav-item">
+            <a class="nav-link{% if request.endpoint == 'auth.admin_users' %} active{% endif %}" href="{{ url_for('auth.admin_users') }}">All Users</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link{% if request.endpoint == 'auth.admin_parking_records' %} active{% endif %}" href="{{ url_for('auth.admin_parking_records') }}">Parking Records</a>
           </li>
@@ -42,16 +46,25 @@
   <!-- BOOTSTRAP NAVBAR END -->
 
   <div class="container mt-5">
-    <h2>Parking Reservations per User</h2>
-    <canvas id="myChart"></canvas>
-    <a href="{{ url_for('auth.admin_dashboard') }}" class="btn btn-secondary mt-3">← Back</a>
+    <div class="row justify-content-center align-items-start">
+      <div class="col-md-6 mb-4">
+        <h2>Parking Reservations per User</h2>
+        <canvas id="reservationsChart" style="max-width: 100%;"></canvas>
+      </div>
+      <div class="col-md-6 mb-4">
+        <h2>Revenue per User</h2>
+        <canvas id="revenueChart" style="max-width: 100%;"></canvas>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.admin_dashboard') }}" class="btn btn-secondary mt-4">← Back</a>
   </div>
 
   <script>
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const labels = {{ labels|tojson }};
-    const data = {
-      labels: labels,
+    // Bar chart: Reservations per user
+    const ctxReservations = document.getElementById('reservationsChart').getContext('2d');
+    const reservationLabels = {{ labels|tojson }};
+    const reservationData = {
+      labels: reservationLabels,
       datasets: [{
         label: 'Reservations',
         data: {{ counts|tojson }},
@@ -60,10 +73,68 @@
         borderWidth: 2
       }]
     };
-    new Chart(ctx, {
+    new Chart(ctxReservations, {
       type: 'bar',
-      data: data,
-      options: { scales: { y: { beginAtZero: true } } }
+      data: reservationData,
+      options: { 
+        scales: { 
+          y: { beginAtZero: true } 
+        } 
+      }
+    });
+
+    // Pie chart: Revenue per user with data labels
+    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+    const revenueLabels = {{ revenue_labels|tojson }};
+    const revenueDataValues = {{ revenue_counts|tojson }};
+    const revenueData = {
+      labels: revenueLabels,
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: revenueDataValues,
+        backgroundColor: [
+          '#36a2eb',
+          '#ff6384',
+          '#ffcd56',
+          '#4bc0c0',
+          '#9966ff',
+          '#ff9f40',
+          '#c9cbcf'
+          // add more colors if needed, or generate dynamically if many users
+        ],
+        borderColor: '#fff',
+        borderWidth: 1
+      }]
+    };
+    new Chart(ctxRevenue, {
+      type: 'pie',
+      data: revenueData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right',
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ₹' + context.parsed;
+              }
+            }
+          },
+          datalabels: {
+            color: '#fff',
+            formatter: function(value, context) {
+              return '₹' + value;
+            },
+            font: {
+              weight: 'bold',
+              size: 16
+            }
+          }
+        }
+      },
+      plugins: [ChartDataLabels]
     });
   </script>
 

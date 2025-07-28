@@ -1,11 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, flash, url_for
+from flask import Blueprint, render_template, request, redirect, flash, url_for, jsonify
 from backend.models import ParkingLot, ParkingSpot, User, Reservation
 from sqlalchemy.orm import sessionmaker, joinedload
-from sqlalchemy import create_engine, desc, func
+from sqlalchemy import create_engine, func, desc
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
-from flask import jsonify
 import re
 
 # DB setup
@@ -237,13 +236,7 @@ def reserve_spot(lot_id):
 
     return redirect(url_for('auth.user_view_lots'))
 
-# Continue cleanup for:
-# - admin_users
-# - admin_parking_records
-# - admin_search
-# - reservation_history
-# - release_spot
-# - api routes (same, just remove session[])
+# ----------------- RESERVATIONS / HISTORY ------------------
 @auth_bp.route('/reservations/history')
 @login_required
 def reservation_history():
@@ -298,6 +291,7 @@ def release_spot(reservation_id):
     session_db.close()
     return redirect(url_for('auth.reservation_history'))
 
+# ----------------- ADMIN USERS ------------------
 @auth_bp.route('/admin/users')
 @login_required
 def admin_users():
@@ -310,6 +304,7 @@ def admin_users():
     session_db.close()
     return render_template('admin_users.html', users=users)
 
+# ----------------- ADMIN PARKING RECORDS ------------------
 @auth_bp.route('/admin/parking_records')
 @login_required
 def admin_parking_records():
@@ -330,6 +325,7 @@ def admin_parking_records():
     session_db.close()
     return render_template('admin_parking_records.html', reservations=reservations)
 
+# ----------------- ADMIN SEARCH ------------------
 @auth_bp.route('/admin/search', methods=['GET', 'POST'])
 @login_required
 def admin_search():
@@ -357,6 +353,7 @@ def admin_search():
 
     return render_template('admin_search.html', results=results, query=query, search_type=search_type)
 
+# ----------------- ADMIN PARKING STATS with revenue ------------------
 @auth_bp.route('/admin/parking_stats')
 @login_required
 def admin_parking_stats():
@@ -366,18 +363,31 @@ def admin_parking_stats():
 
     session_db = Session()
     data = (
-        session_db.query(User.full_name, func.count(Reservation.id))
-        .join(Reservation)
-        .group_by(User.full_name)
+        session_db.query(
+            User.full_name,
+            func.count(Reservation.id).label('reservations_count'),
+            func.coalesce(func.sum(Reservation.cost), 0).label('revenue')
+        )
+        .join(Reservation, Reservation.user_id == User.id)
+        .group_by(User.id)
         .all()
     )
     session_db.close()
 
-    labels = [row[0] for row in data]
-    counts = [row[1] for row in data]
+    labels = [row.full_name for row in data]
+    counts = [row.reservations_count for row in data]
+    revenue_labels = labels
+    revenue_counts = [float(row.revenue) for row in data]
 
-    return render_template('admin_parking_stats.html', labels=labels, counts=counts)
+    return render_template(
+        'admin_parking_stats.html',
+        labels=labels,
+        counts=counts,
+        revenue_labels=revenue_labels,
+        revenue_counts=revenue_counts
+    )
 
+# ----------------- API ROUTES ------------------
 @auth_bp.route('/api/lots', methods=['GET'])
 @login_required
 def api_lots():
@@ -387,4 +397,13 @@ def api_lots():
     session_db = Session()
     lots = session_db.query(ParkingLot).all()
     session_db.close()
-    return jsonify([...])
+    # Return a JSON representation of lots (customize as needed)
+    lots_json = [{
+        'id': lot.id,
+        'name': lot.name,
+        'location': lot.location,
+        'capacity': lot.capacity,
+        'amenities': lot.amenities,
+        'pricing': lot.pricing
+    } for lot in lots]
+    return jsonify(lots_json)
