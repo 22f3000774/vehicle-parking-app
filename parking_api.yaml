@@ -1,0 +1,198 @@
+openapi: 3.0.3
+info:
+  title: Vehicle Parking Management API
+  version: 1.0.0
+  description: >
+    REST API for Vehicle Parking Management System.
+    Provides endpoints for admin operations such as managing parking lots, users, reservations, and retrieving statistics.
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+security:
+  - cookieAuth: []
+
+tags:
+  - name: Parking Lots
+    description: Operations related to parking lots
+  - name: Users
+    description: User management operations
+  - name: Reservations
+    description: Parking reservations and history
+  - name: Analytics
+    description: Parking statistics and reports
+
+paths:
+  /api/lots:
+    get:
+      tags:
+        - Parking Lots
+      summary: Retrieve all parking lots
+      description: Returns a list of all parking lots with their details.
+      responses:
+        '200':
+          description: List of parking lots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParkingLot'
+        '403':
+          description: Forbidden - Admin access only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Example placeholder endpoint for users
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Retrieve all users
+      description: Returns all registered users (admin only).
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Forbidden - Admin access only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Example placeholder for reservations
+  /api/reservations:
+    get:
+      tags:
+        - Reservations
+      summary: Retrieve all parking reservations
+      description: Returns all parking reservations with associated user and spot data (admin only).
+      responses:
+        '200':
+          description: List of reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+        '403':
+          description: Forbidden - Admin access only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+
+  schemas:
+    ParkingLot:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Central Park Lot
+        location:
+          type: string
+          example: Downtown
+        capacity:
+          type: integer
+          example: 50
+        amenities:
+          type: string
+          example: CCTV, EV Charging
+        pricing:
+          type: integer
+          description: Rate per hour in ₹
+          example: 20
+
+    ParkingSpot:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 101
+        spot_number:
+          type: string
+          example: "A1"
+        spot_type:
+          type: string
+          example: Regular
+        status:
+          type: string
+          enum: [available, reserved, occupied]
+          example: available
+        lot_id:
+          type: integer
+          example: 1
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        username:
+          type: string
+          example: johndoe
+        full_name:
+          type: string
+          example: John Doe
+        is_admin:
+          type: boolean
+          example: false
+
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 501
+        user_id:
+          type: integer
+          example: 10
+        spot_id:
+          type: integer
+          example: 101
+        start_time:
+          type: string
+          format: date-time
+          example: '2025-07-29T10:30:00Z'
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2025-07-29T12:30:00Z'
+        status:
+          type: string
+          enum: [active, cancelled, completed]
+          example: active
+        cost:
+          type: integer
+          nullable: true
+          example: 40
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Access denied
+

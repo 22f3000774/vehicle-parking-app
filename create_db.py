@@ -3,7 +3,6 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from werkzeug.security import generate_password_hash
 from backend.models import Base, User
 
 DB_FILENAME = 'parking_lot_app.db'
@@ -25,10 +24,9 @@ default_admin_password = 'adminpass123'
 existing_admin = session.query(User).filter_by(is_admin=True).first()
 
 if not existing_admin:
-    hashed_pw = generate_password_hash(default_admin_password)
     admin_user = User(
         username=default_admin_username,
-        password=hashed_pw,
+        password=default_admin_password,
         full_name='Admin',
         is_admin=True
     )

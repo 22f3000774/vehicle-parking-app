@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, flash, url_for,
 from backend.models import ParkingLot, ParkingSpot, User, Reservation
 from sqlalchemy.orm import sessionmaker, joinedload
 from sqlalchemy import create_engine, func, desc
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 import re
@@ -29,7 +28,7 @@ def login():
         user = session_db.query(User).filter_by(username=username).first()
         session_db.close()
 
-        if user and check_password_hash(user.password, password):
+        if user and user.password == password:
             login_user(user)
             flash('Login successful.', 'success')
             return redirect(url_for('auth.admin_dashboard' if user.is_admin else 'auth.user_dashboard'))
@@ -68,8 +67,7 @@ def register():
             session_db.close()
             return redirect(url_for('auth.register'))
 
-        hashed = generate_password_hash(password)
-        new_user = User(username=username, full_name=full_name, password=hashed, is_admin=False)
+        new_user = User(username=username, full_name=full_name, password=password, is_admin=False)
         session_db.add(new_user)
         session_db.commit()
         session_db.close()
