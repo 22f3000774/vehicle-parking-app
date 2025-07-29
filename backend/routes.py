@@ -169,6 +169,20 @@ def admin_delete_lot(lot_id):
 
     session_db = Session()
     lot = session_db.query(ParkingLot).get(lot_id)
+    spots = session_db.query(ParkingSpot).filter_by(lot_id=lot_id).all()
+
+    # Check if all spots are available (i.e., no spot is reserved or occupied)
+    not_available_spots = [spot for spot in spots if spot.status != 'available']
+    if not_available_spots:
+        session_db.close()
+        flash(
+            "Cannot delete the lot: Some parking spots are not available (reserved/occupied). "
+            "Please ensure all spots are released before deleting.",
+            "danger"
+        )
+        return redirect(url_for('auth.admin_lots'))
+
+    # All spots are available, safe to delete
     session_db.query(ParkingSpot).filter_by(lot_id=lot.id).delete()
     session_db.delete(lot)
     session_db.commit()
